@@ -1,8 +1,8 @@
 import psutil
-from LocalTimes import LocalTimes
-import datetime
+from com.basis.LocalTimes import LocalTimes
 # from __future__ import print_function
 import socket
+import platform
 
 
 class HostInfo(object):
@@ -69,9 +69,13 @@ class HostInfo(object):
                     self.bytes2human(io.bytes_recv), io.packets_recv, io.errin,
                     io.dropin))
                 print("    outgoing       : ", end='')
-                print("bytes=%s, pkts=%s, errs=%s, drops=%s" % (
-                    self.bytes2human(io.bytes_sent), io.packets_sent, io.errout,
-                    io.dropout))
+                print(
+                    "bytes=%s, pkts=%s, errs=%s, drops=%s" %
+                    (self.bytes2human(
+                        io.bytes_sent),
+                        io.packets_sent,
+                        io.errout,
+                        io.dropout))
             for addr in addrs:
                 print(
                     "    %-4s" %
@@ -91,8 +95,48 @@ class HostInfo(object):
     def user(self):
         print(psutil.users())
 
-host = HostInfo()
-host.cpuInfo()
-host.bootTimes()
-host.ipAddr()
-host.user()
+    def ifcfg(self):
+        print(psutil.net_if_stats())
+        print(psutil.net_io_counters(pernic=True))
+        print(psutil.net_if_addrs().items())
+
+    def get_os_info(self):
+        print('------------------------------')
+        # print("system version---- %s" % ", ".join(sys.version.split("\n")))
+        print(
+            '操作系统信息：' +
+            platform.system() +
+            platform.version() +
+            '_' +
+            platform.machine())
+        print('硬件信息：' + platform.processor())
+
+    def get_cpu_linux_info(self):
+        # linux cpu info
+        processor_cnt = 0
+        cpu_model = ""
+        f_cpu_info = open("/proc/cpuinfo")
+        try:
+            for line in f_cpu_info:
+                if (line.find("processor") == 0):
+                    processor_cnt += 1
+                elif (line.find("model name") == 0):
+                    if (cpu_model == ""):
+                        cpu_model = line.split(":")[1].strip()
+
+            print("cpu counts: %s, cpu model: %s" % (processor_cnt, cpu_model))
+        finally:
+            f_cpu_info.close()
+
+    def get_cpu_win_info(self):
+        print('')
+
+
+# host = HostInfo()
+# host.cpuInfo()
+# host.bootTimes()
+# host.ipAddr()
+# host.user()
+# host.ifcfg()
+# host.get_os_info()
+# host.get_cpu_win_info()
