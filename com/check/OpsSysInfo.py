@@ -1,14 +1,16 @@
 import platform
 import psutil
+from com.basis.LocalTimes import *
 
 
 class OpsSysInfo(object):
     def __init__(self):
-        pass
+        self.localtimes = LocalTimes()
 
     def summary(self):
         print('操作系统类型：' + self.getOsInfo())
-        print('系统已运行时间:' + str(self.getBootTime()))
+        print(int(self.getBootTime()))
+        print('系统已运行时间:' + self.localtimes.timestamp10_to_strtime(self.getBootTime()))
 
     @classmethod
     def getOsInfo(cls):
